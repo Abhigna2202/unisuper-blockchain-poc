@@ -8,7 +8,7 @@ contract("Account", accounts => {
     
             await employeeAccount1.createnNewAccount();
             const accountAddress = await employeeAccount1.getArrayofAccounts.call();
-            cont accountInstance = await Account.at(accountAddress[0]);
+            const accountInstance = await Account.at(accountAddress[0]);
     
             const currentReward = accountInstance.RewardSize;
             accountInstance.increaseRewardSize(100);
