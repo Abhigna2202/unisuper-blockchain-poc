@@ -9,7 +9,7 @@ contract Employers{
     address payable public EmployerAddress;
     address public EmployerPayoutAddress;
     address public EmployeePayoutAddress;
-    uint32 public EmployeeCounter;
+    uint32 public EmployerCounter;
     string public EmployerDOB;
 
     mapping (string => address) EmployerIdentifierToContractMap; // Map stores identifier string => contract address
@@ -20,11 +20,11 @@ contract Employers{
         EmployerAddress = _emplrAddress;
         EmployerId = address(this);
         EmployerDOB = _emplrdob;
-        EmployeeCounter = 0;
+        EmployerCounter = 0;
         createIdentifier(_username,_contractname);
     }
 
-    //Update teh two maps with the respective values
+    //Update the two maps with the respective values
     //a thought if this function to be private or public
     function createIdentifier(string memory _username, string memory _contractname) private {
         string memory _identity = "employer_";
@@ -33,7 +33,7 @@ contract Employers{
         EmployerUsernameToIdentifierMap[_username] = string(_identifier);
     }
 
-    // functions go here
+    // Functions Go Here
     //AddEmployee
     //DeleteEmployee
     //PayEmployeeFrequency
