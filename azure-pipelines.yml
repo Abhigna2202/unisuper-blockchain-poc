@@ -1,19 +1,71 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Node.js React Web App to Linux on Azure
+# Build a Node.js React app and deploy it to Azure as a Linux web app.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- master
+- DevOps/AzurePipelines
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-16.04'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  # Azure Resource Manager connection created during pipeline creation
+  azureSubscription: 'dc90c861-a871-4c49-a5fb-797e04b32bc2'
+  # Environment name
+  environmentName: 'production'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: Install
+    displayName: Install Project Dependencies
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '8.11.0'
+      - script: npm install -g yarn
+      - script: npm install -g truffle
+      - script: yarn install
+      - script: truffle compile
+
+
+- stage: Upload
+  displayName: Upload
+  jobs:
+  - job: Archive
+    displayName: Archive Artifacts
+    steps:
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Build'
+      inputs:
+        path: '$(System.DefaultWorkingDirectory)'
+        artifact: unisuper-blockchain-poc
+
+# - stage: Deploy
+#   displayName: Deploy stage
+#   dependsOn: Build
+#   condition: succeeded()
+#   jobs:
+#   - deployment: Deploy
+#     displayName: Deploy
+#     environment: $(environmentName)
+#     pool:
+#       vmImage: $(vmImageName)
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: AzureRmWebAppDeployment@4
+#             displayName: 'Azure App Service Deploy: '
+#             inputs:
+#               azureSubscription: $(azureSubscription)
+#               appType: webAppLinux
+#               WebAppName: $(webAppName)
+#               packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+#               RuntimeStack: 'NODE|10.10'
+#               StartupCommand: 'npm run start'
+#               ScriptType: 'Inline Script'
+#               InlineScript: |
+#                 truffle
