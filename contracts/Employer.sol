@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import './helpers/SafeMath.sol';
 
-contract Employers{
+contract Employer{
     using SafeMath for *;
 
     address public EmployerId;
@@ -12,10 +12,10 @@ contract Employers{
     uint32 public EmployerCounter;
     string public EmployerDOB;
 
-    mapping (string => address) EmployerIdentifierToContractMap; // Map stores identifier string => contract address
+    mapping (string => address) EmployerContracts; // Map stores identifier string => contract address
 
-    mapping (string => string) EmployerUsernameToIdentifierMap; // Map stores username string => identifier string
-    
+    mapping (string => string) EmployerUsernames; // Map stores username string => identifier string
+
     constructor(string memory _emplrdob, address payable _emplrAddress, string memory _username, string memory _contractname) public {
         EmployerAddress = _emplrAddress;
         EmployerId = address(this);
@@ -25,12 +25,11 @@ contract Employers{
     }
 
     //Update the two maps with the respective values
-    //a thought if this function to be private or public
-    function createIdentifier(string memory _username, string memory _contractname) private {
+    function createIdentifier(string memory _username, string memory _contractname) internal {
         string memory _identity = "employer_";
-        bytes memory _identifier = abi.encodePacked(_identity,"_",_username,"_",_contractname);
-        EmployerIdentifierToContractMap[string(_identifier)] = EmployerId;
-        EmployerUsernameToIdentifierMap[_username] = string(_identifier);
+        bytes memory _identifier = abi.encodePacked(_identity,_username,"_",_contractname);
+        EmployerContracts[string(_identifier)] = EmployerId;
+        EmployerUsernames[_username] = string(_identifier);
     }
 
     // Functions Go Here

@@ -25,15 +25,19 @@ contract Employee {
     uint32 public Counter;
     string public DOB;
 
+    mapping (string => address) EmployeeContracts; // Map stores identifier string => contract address
+
+    mapping (string => string) EmployeeUsernames; // Map stores username string => identifier string
     mapping (address => Account) Accounts;
     Account[] arrayOfAccounts;
     event LogCreateNewAccount(Account loggedAccount);
 
-    constructor(string memory dob, address payable _empAddress) public {
+    constructor(string memory dob, address payable _empAddress, string memory _contractname,string memory _username) public {
         EmployeeAddress = _empAddress;
         EmployeeId = address(this);
         DOB = dob;
         Counter = 0;
+        createIdentifier(_username,_contractname); // call to create identifier()
     }
 
 //Modifier for owner access permission
@@ -43,7 +47,6 @@ contract Employee {
     }
 
     function setPayoutAddress(address payoutAddress) public onlyOwner(EmployeeAddress){
-        require(msg.sender == EmployeeAddress, "Invalid Authorization");
         PayoutAddress = payoutAddress;
     }
 
@@ -64,7 +67,6 @@ contract Employee {
     }
 
     function createNewAccount() public onlyOwner(EmployeeAddress){
-        require(msg.sender == EmployeeAddress, "Invalid Authorization");
         Account tempAccountStore = new Account(EmployeeId, Account.AccountAccumulationType.Accumulation1);
         Accounts[address(tempAccountStore)] = tempAccountStore;
         arrayOfAccounts.push(tempAccountStore);
@@ -103,4 +105,12 @@ contract Employee {
     }
 
     function () external payable {}
+
+
+    function createIdentifier(string memory _username, string memory _contractname) internal{
+        string memory _identity = "employee_";
+        bytes memory _identifier = abi.encodePacked(_identity,_username,"_",_contractname);
+        EmployeeContracts[string(_identifier)] = EmployeeId;
+        EmployeeUsernames[_username] = string(_identifier);
+    }
 }
